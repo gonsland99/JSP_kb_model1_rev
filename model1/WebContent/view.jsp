@@ -1,13 +1,20 @@
+<%@page import="com.test.model1.vo.Bbs"%>
+<%@page import="com.test.model1.dao.BbsDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%
+<% 
 	request.setCharacterEncoding("UTF-8");
-	if(session.getAttribute("userId") == null) {
-		out.println("<script>");
-		out.println("alert('로그인이 필요한 서비스입니다.');");
-		out.println("location.href='bbs.jsp';");
-		out.println("</script>");
-	}
+	int bbsId = 0;
+	BbsDAO bbsDAO = null;
+	Bbs bbs = null;
+	if(request.getParameter("bbsId") == null){
+		out.println("<script>alert('작성된 글이 없습니다.');location.href='bbs.jsp';</script>"); //history.back();
+	} else {
+		bbsId = Integer.parseInt(request.getParameter("bbsId"));
+		bbsDAO = new BbsDAO();
+		bbs = bbsDAO.getBbs(bbsId);
+		if(bbs.getBbsId() == 0) out.println("<script>alert('글번호가 없습니다.');location.href='bbs.jsp';</script>");
+	} 
 %>
 <!DOCTYPE HTML>
 <html>
@@ -21,7 +28,7 @@
 <link rel="stylesheet"
 	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
 
-<title>메인페이지</title>
+<title>글보기 페이지</title>
 </head>
 <body>
 	<nav class="navbar navbar-expand-sm navbar-light bg-light">
@@ -64,34 +71,44 @@
 		</div>
 	</nav>
 	<div class="container pt-3">
-			<form method="post" action="writeAction.jsp">
-				<table class="table table-striped text-center table-bordered">
-					<thead class="thead-light">
-						<tr>
-							<th>게시판 글쓰기</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td><input type="text" class="form-control" placeholder="글 제목" name="bbsTitle" maxlength="50" /></td>
-						</tr>
-						<tr>
-							<td>
-								<textarea class="form-control" placeholder="글 내용" name="bbsContent"
-								maxlength="65535" style="height: 350px; resize: none;"></textarea>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-				<a href="bbs.jsp" class="btn btn-primary float-left">목록</a>
-				<button type="submit" class="btn btn-primary float-right">글쓰기</button>
-			</form>
+		<table class="table table-striped text-center table-bordered">
+			<thead class="thead-light">
+				<tr>
+					<th colspan="2">게시판 글보기</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td style="width:100px;">제목</td>
+					<td class="text-left"><%=bbs != null ? bbs.getBbsTitle() : "" %></td>
+				</tr>
+				<tr>
+					<td class="align-middle">본문</td>
+					<td style="height: 350px; overflow:auto;" class="text-left"><%=bbs != null ? bbs.getBbsContent() : "" %></td>
+				</tr>
+			</tbody>
+		</table>
+		<a href="bbs.jsp" class="btn btn-primary float-left">목록</a>
+		<%
+			String writer = bbs.getUserId();
+			String userId = (String)session.getAttribute("userId");
+			if(writer.equals(userId)){
+		%>		
+		<%  } %>
+		<a href="delAction.jsp?bbsId=<%=bbs.getBbsId() %>" class="btn btn-danger float-right" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
+		<a href="modify.jsp?bbsId=<%=bbs.getBbsId() %>" class="btn btn-warning float-right mr-1">수정</a>
 	</div>
-
+	<%
+		if(bbsDAO != null){
+			bbsDAO.bdClose();
+		}
+	%>
 	<!-- Optional JavaScript -->
 	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-	<script	src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-	<script	src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+	<script
+		src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -1,12 +1,27 @@
+<%@page import="com.test.model1.vo.Bbs"%>
+<%@page import="com.test.model1.dao.BbsDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%
 	request.setCharacterEncoding("UTF-8");
-	if(session.getAttribute("userId") != null) {
+	if(session.getAttribute("userId") == null) {
 		out.println("<script>");
-		out.println("alert('이미 로그인 되었습니다.');");
-		out.println("location.href='main.jsp';");
+		out.println("alert('로그인이 필요한 서비스입니다.');");
+		out.println("location.href='bbs.jsp';");
 		out.println("</script>");
+	}
+	int bbsId = Integer.parseInt(request.getParameter("bbsId"));
+	BbsDAO bbsDAO = new BbsDAO();
+	Bbs bbs = bbsDAO.getBbs(bbsId);
+	
+	String writer = bbs.getUserId();
+	String userId = (String)session.getAttribute("userId");
+	if(!writer.equals(userId)){
+		out.println("<script>");
+		out.println("alert('글 작성자만 수정이 가능합니다.')");
+		out.println("location.href='bbs.jsp'");
+		out.println("</script>");
+		return;
 	}
 %>
 <!DOCTYPE HTML>
@@ -21,7 +36,7 @@
 <link rel="stylesheet"
 	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
 
-<title>로그인</title>
+<title>글 수정</title>
 </head>
 <body>
 	<nav class="navbar navbar-expand-sm navbar-light bg-light">
@@ -37,8 +52,8 @@
 			<ul class="navbar-nav">
 				<li class="nav-item"><a class="nav-link" href="main.jsp">메인</a>
 				</li>
-				<li class="nav-item"><a class="nav-link" href="bbs.jsp">게시판</a>
-				</li>
+				<li class="nav-item"><a class="nav-link active" href="bbs.jsp">게시판<span
+						class="sr-only">(current)</span></a></li>
 			</ul>
 			<ul class="navbar-nav ml-auto">
 				<li class="nav-item dropdown"><a
@@ -46,12 +61,17 @@
 					role="button" data-toggle="dropdown" aria-haspopup="true"
 					aria-expanded="false">접속하기</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-					<% if(session.getAttribute("userId") == null) { %>
-						<a class="dropdown-item active" href="login.jsp">로그인<span
-							class="sr-only">(current)</span></a>
-					<% } else { %>
+						<%
+							if (session.getAttribute("userId") == null) {
+						%>
+						<a class="dropdown-item" href="login.jsp">로그인</a>
+						<%
+							} else {
+						%>
 						<a class="dropdown-item" href="logoutAction.jsp">로그아웃</a>
-					<% } %>
+						<%
+							}
+						%>
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="join.jsp">회원가입</a>
 					</div></li>
@@ -59,20 +79,30 @@
 		</div>
 	</nav>
 	<div class="container pt-3">
-		<div class="col-lg-4 offset-lg-4">
-			<div class="jumbotron pt-5">
-				<form method="post" action="loginAction.jsp">
-					<h3 class="text-center pb-2">JSP 게시판</h3>
-					<div class="form-group">
-						<input type="text" class="form-control" name="userId" placeholder="아이디" maxlength="20" required="required" autocomplete="no" />
-					</div>
-					<div class="form-group">
-						<input type="password" class="form-control" name="userPassword" placeholder="비밀번호" maxlength="20" required="required" />
-					</div>
-					<button type="submit" class="btn btn-primary form-control">로그인</button>
-				</form>
-			</div>
-		</div>
+			<form method="post" action="modifyAction.jsp">
+				<table class="table table-striped text-center table-bordered">
+					<thead class="thead-light">
+						<tr>
+							<th>게시판 글수정</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><input type="text" class="form-control" placeholder="글 제목" name="bbsTitle" 
+							maxlength="50" value="<%=bbs.getBbsTitle() %>"/></td>
+						</tr>
+						<tr>
+							<td>
+								<textarea class="form-control" placeholder="글 내용" name="bbsContent"
+								maxlength="65535" style="height: 350px; resize: none;"><%=bbs.getBbsContent() %></textarea>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<input type="hidden" name="bbsId" value="<%=bbsId %>"/>
+				<a href="bbs.jsp" class="btn btn-primary float-left">목록</a>
+				<button type="submit" class="btn btn-warning float-right">글수정</button>
+			</form>
 	</div>
 
 	<!-- Optional JavaScript -->

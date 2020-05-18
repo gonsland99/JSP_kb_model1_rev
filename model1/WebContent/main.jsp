@@ -8,12 +8,10 @@
 <head>
 <!-- Required meta tags -->
 <meta charset="utf-8" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
 <!-- Bootstrap CSS -->
-<link rel="stylesheet"
-	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
 
 <title>메인페이지</title>
 </head>
@@ -52,7 +50,12 @@
 		</div>
 	</nav>
 	<div class="container pt-3">
-		메인페이지입니다.
+		<div class="jumbotron">
+			<h1>웹 사이트 소개</h1>
+			<p> 이 웹 사이트는 JSP로 제작한 웹 사이트 입니다. 간단한 게시판 기능을 구현하였습니다.
+				디자인 템플릿으로는 부트 스트랩을 사용하였습니다.</p>
+			<a class="btn btn-primary btn-lg" href="#" role="button">자세히 알아보기</a>
+		</div>
 	</div>
 
 	<!-- Optional JavaScript -->
